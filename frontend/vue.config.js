@@ -37,29 +37,13 @@ module.exports = {
       errors: true
     },
     proxy: {
-      '/manage': {
-        target: 'http://localhost:8095', // 后台接口域名
-        ws: true, // 如果要代理 websockets，配置这个参数
-        secure: false, // 如果是https接口，需要配置这个参数
-        changeOrigin: true, // 是否跨域
-        pathRewrite: {
-          '^/manage': '/'
-        }
-      },
       '/users': {
-        target: 'http://localhost:8098', // 后台接口域名
+        target: 'http://localhost:8084', // 后台接口域名
         ws: true, // 如果要代理 websockets，配置这个参数
         secure: false, // 如果是https接口，需要配置这个参数
         changeOrigin: true, // 是否跨域
         pathRewrite: {
           '^/users': '/'
-        }
-      },
-      '/apiSohu': {
-        target: 'http://pv.sohu.com/', // localhost=>target
-        changeOrigin: true,
-        pathRewrite: {
-          '/apiSohu': '/'
         }
       }
     }

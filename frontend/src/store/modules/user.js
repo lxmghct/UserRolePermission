@@ -1,7 +1,7 @@
 import { login } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
-import md5 from 'js-md5'
+// import md5 from 'js-md5'
 
 const state = {
   token: getToken(),
@@ -38,9 +38,8 @@ const actions = {
   // user login
   login({ commit }, userInfo) {
     const params = new URLSearchParams()
-    params.append('userName', userInfo.username)
-    params.append('password', md5(userInfo.password))
-    params.append('ip', userInfo.ip)
+    params.append('username', userInfo.username)
+    params.append('password', userInfo.password)
     params.append('system', '数据管理系统')
     return new Promise((resolve, reject) => {
       login(params).then(response => {
@@ -49,25 +48,17 @@ const actions = {
         commit('SET_ID', response.data.user.id)
         localStorage.setItem('userId', response.data.user.id)
         const componentSet = new Set()
-        // if (response.data.component && response.data.component.length > 0) {
-        //   response.data.component.forEach(item => {
-        //     const temp = item.replace(/^\//, '').replace(/\/$/, '').replace(/^system\//, '')
-        //     let index = temp.indexOf('/')
-        //     while (index > 0) {
-        //       componentSet.add(temp.substring(0, index))
-        //       index = temp.indexOf('/', index + 1)
-        //     }
-        //     componentSet.add(temp)
-        //   })
-        // }
-        componentSet.add('')
-        componentSet.add('dashboard')
-        componentSet.add('user')
-        componentSet.add('user/index')
-        componentSet.add('permission')
-        componentSet.add('permission/index')
-        componentSet.add('role')
-        componentSet.add('role/index')
+        if (response.data.component) {
+          response.data.component.forEach(item => {
+            const temp = item.replace(/^\//, '').replace(/\/$/, '').replace(/^system\//, '')
+            let index = temp.indexOf('/')
+            while (index > 0) {
+              componentSet.add(temp.substring(0, index))
+              index = temp.indexOf('/', index + 1)
+            }
+            componentSet.add(temp)
+          })
+        }
         localStorage.setItem('component', Array.from(componentSet))
         sessionStorage.setItem('loginInformation', JSON.stringify(response.data))
         commit('SET_NAME', response.data.user.trueName)
