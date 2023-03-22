@@ -21,7 +21,7 @@ public interface UserMapper extends BaseMapper<User> {
             @Result(column = "sex", property = "sex"),
             @Result(column = "avatar", property = "avatar"),
             @Result(column = "status", property = "status"),
-            @Result(column = "createTime", property = "createTime"),
+            @Result(column = "create_time", property = "createTime"),
             @Result(column = "phone", property = "phone"),
             @Result(column = "address", property = "address"),
             @Result(column = "note", property = "note"),
