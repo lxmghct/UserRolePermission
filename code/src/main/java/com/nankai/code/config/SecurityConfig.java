@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.web.filter.CorsFilter;
 
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
@@ -26,6 +27,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private UserAccessDeniedHandler userAccessDeniedHandler;
+
+    @Autowired
+    private LogoutSuccessHandler logoutSuccessHandler;
 
     @Autowired
     private CorsFilter corsFilter;
@@ -75,6 +79,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         //登出
         http.logout()
                 .logoutUrl("/user/logout")
+                .logoutSuccessHandler(logoutSuccessHandler)
                 .deleteCookies("Authorization");
 
         // 在UsernamePassword过滤器之前添加JWT过滤器
