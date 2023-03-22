@@ -86,29 +86,40 @@ export const asyncRoutes = [
     path: '/user',
     component: Layout,
     redirect: 'noRedirect',
-    name: 'User',
-    meta: {
-      title: '用户管理',
-      icon: 'user'
-    },
     children: [
       {
         path: 'index',
         component: () => import('@/views/user/user/index'),
-        name: 'UserList',
-        meta: { title: '用户', noCache: true }
-      },
+        name: 'User',
+        meta: { title: '用户管理', icon: 'user', noCache: true }
+      }
+    ]
+  },
+
+  {
+    path: '/role',
+    component: Layout,
+    redirect: 'noRedirect',
+    children: [
       {
-        path: 'permission',
-        component: () => import('@/views/user/permission/index'),
-        name: 'PermissionList',
-        meta: { title: '权限', noCache: true }
-      },
-      {
-        path: 'role',
+        path: 'index',
         component: () => import('@/views/user/role/index'),
-        name: 'RoleList',
-        meta: { title: '角色', noCache: true }
+        name: 'Role',
+        meta: { title: '角色管理', icon: 'user', noCache: true }
+      }
+    ]
+  },
+
+  {
+    path: '/permission',
+    component: Layout,
+    redirect: 'noRedirect',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/user/permission/index'),
+        name: 'Permission',
+        meta: { title: '权限管理', icon: 'user', noCache: true }
       }
     ]
   },
