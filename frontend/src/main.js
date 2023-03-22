@@ -70,11 +70,13 @@ axios.interceptors.request.use(
 
 // axios若返回非200状态码, 则message提示
 axios.interceptors.response.use(
-  (res) => {
-    return res
-  },
+  (res) => res,
   (error) => {
-    Element.Message.error('请求失败，请稍后重试')
+    if (error.response.status === 403) {
+      Element.Message.error('权限不足, 请联系管理员')
+    } else {
+      Element.Message.error('请求失败，请稍后重试')
+    }
     return Promise.reject(error)
   }
 )
