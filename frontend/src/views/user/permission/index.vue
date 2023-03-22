@@ -47,25 +47,21 @@
       <el-table-column label="序号" type="index" width="60" />
       <el-table-column label="权限名称" width="300">
         <template slot-scope="scope">
-          <template v-if="scope.row.classify === 'system'">
+          <el-checkbox
+            v-if="scope.row.classify !== '模块权限'"
+            v-model="scope.row.checked"
+            style="margin-left: 5px; margin-right: 10px;"
+            @change="handleCheckChange(scope.row)"
+          />
+          <template v-if="scope.row.classify === '模块权限'">
             <span style="font-weight: bold;">{{ scope.row.name }}</span>
           </template>
           <template v-else>
-            <el-checkbox
-              v-if="scope.row.classify !== '模块权限'"
-              v-model="scope.row.checked"
-              style="margin-left: 5px; margin-right: 10px;"
-              @change="handleCheckChange(scope.row)"
-            />
             <span>{{ scope.row.name }}</span>
           </template>
         </template>
       </el-table-column>
-      <el-table-column label="权限类别" prop="classify" width="200">
-        <template slot-scope="scope">
-          <span> {{ scope.row.classify === 'system' ? '' : scope.row.classify }} </span>
-        </template>
-      </el-table-column>
+      <el-table-column label="权限类别" prop="classify" width="200" />
       <el-table-column label="描述" prop="description" width="300" />
       <el-table-column label="创建时间" prop="createTime" width="200" />
     </el-table>
