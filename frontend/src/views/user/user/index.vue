@@ -107,8 +107,8 @@
             type="primary"
             size="mini"
             style="margin-left: 10px"
-            @click="handleUpdate(row)"
-          >编辑</el-button>
+            @click="handleAssignRole(row)"
+          >分配角色</el-button>
           <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="checkChange(row,$index)">
             删除
           </el-button>
@@ -119,46 +119,28 @@
     <!-- 分页器 -->
     <el-pagination align="center" :current-page="pageNum" :page-sizes="[5,10,20]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
 
-    <!-- 修改用户信息dialog -->
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :center="true" width="800px">
-      <h3>基本信息：</h3>
-      <el-form ref="dataForm" :model="temp" :rules="rules" label-position="left" label-width="80px" style="width: 550px; margin-left:50px;">
-        <el-row>
-          <el-col :span="20">
-            <el-form-item label="用户名" prop="username">
-              <el-input v-model="temp.username" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="20">
-            <el-form-item label="真实姓名" prop="truename">
-              <el-input v-model="temp.truename" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :span="20">
-            <el-form-item label="地址" prop="address">
-              <el-input v-model="temp.address" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="20">
-            <el-form-item label="电话" prop="phone">
-              <el-input v-model="temp.phone" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="性别" prop="sex">
-              <el-select v-model="temp.sex" class="filter-item" placeholder="请选择">
-                <el-option v-for="item in genderOptions" :key="item.key" :label="item.key" :value="item.key" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="20" />
-        </el-row></el-form>
+    <!-- 分配用户角色dialog -->
+    <el-dialog title="用户角色分配" :visible.sync="dialogFormVisible" :center="true" width="800px">
+      <el-form ref="dataForm" :model="roleAssignForm" label-position="left" label-width="80px" style="width: 550px; margin-left:50px;">
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="roleAssignForm.username" disabled />
+        </el-form-item>
+        <el-form-item label="角色" prop="role">
+          <el-select v-model="roleAssignForm.roleList" multiple class="filter-item" placeholder="请选择">
+            <el-option
+              v-for="item in roleList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+      </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
           取消
         </el-button>
-        <el-button type="primary" @click="updateUserInfo">
+        <el-button type="primary" @click="assignRole">
           确认
         </el-button>
       </div>
@@ -230,61 +212,6 @@
         <el-button type="primary" @click="dialogPvVisible = false">Confirm</el-button>
       </span>
     </el-dialog>
-
-    <!-- 用户导入对话框 -->
-    <el-dialog :title="upload.title" :visible.sync="upload.open" width="400px" append-to-body>
-      <el-form ref="ruleForm" :rules="rules" label-width="80px" class="demo-ruleForm">
-        <el-form-item label="选择角色">
-          <el-select v-model="roleIdList" class="filter-item" placeholder="请选择" style="margin-bottom: 0;margin-left: 10px">
-            <el-option v-for="item in roleList" :key="item.id" :label="item.name" :value="item.id" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="">
-          <el-upload
-            :limit="1"
-            class="filter-item"
-            style="margin-bottom: 0;margin-left: 10px"
-            action=""
-            :before-upload="updateFiles"
-          >
-            <el-button type="primary" icon="el-icon-upload2">
-              导入用户文件
-            </el-button>
-            <!-- <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div> -->
-          </el-upload>
-        </el-form-item>
-        <el-form-item label="">
-          <el-button class="filter-item" type="primary" style="margin-bottom: 0;margin-left: 10px" icon="el-icon-download" @click="downloadExample">
-            下载示例文件
-          </el-button>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="upload.open = false">关闭</el-button>
-      </div>
-    </el-dialog>
-
-    <!-- 用户角色分配dialog -->
-    <el-dialog :visible.sync="operationMessage" width="400px">
-      <el-form ref="ruleForm" :rules="rules" label-width="80px" class="demo-ruleForm">
-        <el-form-item label="当前用户">
-          <el-input v-model="temp.username" :disabled="true" width="200px" />
-        </el-form-item>
-        <el-form-item label="当前角色">
-          <el-input v-model="temp.roleIdList" :disabled="true" width="200px" />
-        </el-form-item>
-        <el-form-item label="分配角色">
-          <el-select v-model="roleStr" multiple class="filter-item" placeholder="请选择">
-            <el-option v-for="item in roleList" :key="item.id" :label="item.name" :value="item.id" />
-          </el-select>
-        </el-form-item>
-      </el-form>
-
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="operationMessage = false">取 消</el-button>
-        <el-button :data-warden-title="'用户${temp.username}增加角色，角色Id为${roleStr}'" type="primary" @click="handleRoleChange">确 定</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
@@ -337,7 +264,6 @@ export default {
       value: '',
       msg: 'Welcome to Your Vue.js App',
       dateRange: ['', ''],
-      operationMessage: false, // 权限弹窗
       roleStr: [],
       roleList: [],
       genderOptions: [{
@@ -463,7 +389,12 @@ export default {
         address: [{ required: true, message: '地址为必填项', trigger: 'blur' }]
       },
       downloadLoading: false,
-      sourceTotal: 0
+      sourceTotal: 0,
+      roleAssignForm: {
+        username: '',
+        roleList: [],
+        userId: undefined
+      }
     }
   },
   watch: {
@@ -483,24 +414,6 @@ export default {
     this.chart = null
   },
   methods: {
-    // 权限操作选择
-    handleCommand(command, row) {
-      switch (command) {
-        case 'handleDataScope':
-          this.handleUpdate(row)
-          break
-        case 'handleOperationScope':
-          this.operationChange(row)
-          break
-        default:
-          break
-      }
-    },
-    operationChange(row) {
-      this.getRoleList()
-      this.temp = Object.assign({}, row) // copy obj
-      this.operationMessage = true
-    },
     checkChange(row) {
       if (row.id !== undefined) {
         this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
@@ -524,29 +437,6 @@ export default {
           })
         }
       }
-    },
-    handleRoleChange() {
-      const params = new URLSearchParams()
-      const url = '/users/user/gitrole'
-      params.append('userId', this.temp.id)
-      params.append('roleIdList', this.roleStr)
-
-      const responseType = 'blob'
-      this.$http.post(url, params, responseType).then((res) => {
-        if (res.status === 200) {
-          this.$message({
-            type: 'success',
-            message: '修改成功!'
-          })
-          this.getRoles()
-          this.operationMessage = false
-        } else {
-          this.$message({
-            type: 'error',
-            message: '修改失败!'
-          })
-        }
-      })
     },
     handleSelectionChange(val) {
       this.multipleSelection = val
@@ -680,6 +570,37 @@ export default {
       this.dialogFormVisible2 = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
+      })
+    },
+
+    handleAssignRole(row) {
+      this.roleAssignForm.userId = row.id
+      this.roleAssignForm.username = row.username
+      this.roleAssignForm.roleList = []
+      this.dialogFormVisible = true
+      this.getRoleList()
+    },
+
+    assignRole() {
+      if (this.roleAssignForm.roleList.length === 0 || !this.roleAssignForm.userId) {
+        this.$message({
+          type: 'error',
+          message: '请选择角色'
+        })
+        return
+      }
+      const params = new URLSearchParams()
+      params.append('userId', this.roleAssignForm.userId)
+      params.append('roleIdList', this.roleAssignForm.roleList)
+      this.$http.put('/users/user/updateUserRoles', params).then((res) => {
+        if (res.status === 200) {
+          this.$message({
+            type: 'success',
+            message: '分配角色成功!'
+          })
+          this.dialogFormVisible = false
+          this.handleQuery()
+        }
       })
     },
 

@@ -202,13 +202,13 @@ public class UserController {
 
     /**
      * 新增用户
-     *
      * @param username
      * @param truename
      * @param password
      * @param sex
      * @param phone
      * @param address
+     * @param roleIdList
      * @return
      */
     @PostMapping("/addUser")
@@ -218,7 +218,8 @@ public class UserController {
                                       @RequestParam(value = "password", required = true) String password,
                                       @RequestParam(value = "sex", required = true) String sex,
                                       @RequestParam(value = "phone", required = true) String phone,
-                                      @RequestParam(value = "address", required = true) String address) {
+                                      @RequestParam(value = "address", required = true) String address,
+                                      @RequestParam(value = "roleIdList", required = true) List<Integer> roleIdList)  {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
         userQueryWrapper.eq("username", username);
         //1.查询是否存在重名用户
@@ -239,13 +240,23 @@ public class UserController {
                 .setCreateTime(new Date())
                 .setAvatar("defalut.jpg");
         //2.添加新用户
+        //2.添加新用户
         if (userService.save(user)) {
+            //3.添加用户成功后，添加用户与角色的对应关系
+            int userId = userService.getOne(userQueryWrapper).getId();
+            for (int i = 0; i < roleIdList.size(); i++) {
+                UserRole userRole = new UserRole();
+                userRole.setUserId(userId)
+                        .setCreateTime(new Date())
+                        .setRoleId(roleIdList.get(i));
+                userRoleService.save(userRole);
+            }
             return ResponseVO.success(CodeEnum.SUCCESS, "用户新增成功");
         }
-        return ResponseVO.success(CodeEnum.SUCCESS, "用户新增失败");
+
+        return ResponseVO.error(CodeEnum.ERROR, "用户新增失败");
 
     }
-
 
     /**
      * 登出
