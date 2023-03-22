@@ -197,7 +197,6 @@ export default {
       const url = '/users/role/getRoleList'
       params.append('pageNum', this.pageNum)
       params.append('pageSize', this.pageSize)
-      params.append('name', this.userName)
       this.$http.post(url, params).then((res) => {
         this.list = res.data.data.roleList
         this.total = res.data.data.total

@@ -7,165 +7,117 @@
  -->
 <template>
   <div class="app-container">
-    <el-row :gutter="24">
-      <!-- {{ multipleSelection }} -->
-      <!--部门数据-->
-      <el-col :span="4" :xs="24">
-        <el-card class="box-card">
-          <div class="head-container">
-            <el-input
-              v-model="deptName"
-              placeholder="机构名称"
-              clearable
-              size="small"
-              prefix-icon="el-icon-search"
-              style="margin-bottom: 20px"
+    <el-form ref="queryForm" :model="queryParams" size="small" :inline="true" label-width="68px">
+      <el-form-item label="用户名称" prop="username">
+        <el-input
+          v-model="name"
+          placeholder="请输入用户名称"
+          clearable
+          style="width: 240px"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="创建时间">
+        <div style="display:inline-block;">
+          <div class="block" style="display:inline-block;">
+            <el-date-picker
+              v-model="dateRange[0]"
+              style="width: 130px"
+              value-format="yyyy-MM-dd"
+              type="date"
+              placeholder="起始日期"
             />
           </div>
-          <div class="head-container">
-            <el-scrollbar wrap-class="scrollbar-wrapper">
-              <el-tree
-                ref="tree"
-                :data="sublibraryList"
-                :props="defaultProps"
-                :expand-on-click-node="false"
-                :filter-node-method="filterNode"
-                default-expand-all
-                highlight-current
-                @node-click="handleNodeClick"
-              > <span slot-scope="{ data }" class="custom-tree-node">
-                <span>{{ data.name }}</span>
-                <span /></span></el-tree></el-scrollbar>
-          </div>
-        </el-card>
-      </el-col>
-      <!--用户数据-->
-      <el-col :span="20" :xs="24">
-        <el-form ref="queryForm" :model="queryParams" size="small" :inline="true" label-width="68px">
-          <el-form-item label="用户名称" prop="userName">
-            <el-input
-              v-model="name"
-              placeholder="请输入用户名称"
-              clearable
-              style="width: 240px"
-              @keyup.enter.native="handleQuery"
+          <div class="block" style="display:inline-block;margin-left:10px;">
+            <el-date-picker
+              v-model="dateRange[1]"
+              style="width: 130px"
+              value-format="yyyy-MM-dd"
+              type="date"
+              placeholder="截止日期"
             />
-          </el-form-item>
-          <el-form-item label="创建时间">
-            <div style="display:inline-block;">
-              <div class="block" style="display:inline-block;">
-                <el-date-picker
-                  v-model="dateRange[0]"
-                  style="width: 130px"
-                  value-format="yyyy-MM-dd"
-                  type="date"
-                  placeholder="起始日期"
-                />
-              </div>
-              <div class="block" style="display:inline-block;margin-left:10px;">
-                <el-date-picker
-                  v-model="dateRange[1]"
-                  style="width: 130px"
-                  value-format="yyyy-MM-dd"
-                  type="date"
-                  placeholder="截止日期"
-                />
-              </div>
-            </div>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-            <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-          </el-form-item>
-        </el-form>
+          </div>
+        </div>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+      </el-form-item>
+    </el-form>
 
-        <el-row :gutter="10" class="mb8">
-          <el-col :span="1.5">
-            <el-button
-              v-hasPermi="['system:user:add']"
-              type="primary"
-              plain
-              icon="el-icon-plus"
-              size="mini"
-              @click="handleCreate"
-            >新增</el-button>
-          </el-col>
-          <el-col :span="1.5">
-            <el-button
-              v-hasPermi="['system:user:remove']"
-              :data-warden-title="'删除用户${multipleSelection}'"
-              type="danger"
-              plain
-              icon="el-icon-delete"
-              size="mini"
-              :disabled="multiple"
-              @click="checkChange"
-            >删除</el-button>
-          </el-col>
-          <el-col :span="1.5">
-            <userInportDialog />
-          </el-col>
-          <el-col :span="1.5">
-            <userExportDialog />
-          </el-col>
-          <!-- <right-toolbar :show-search.sync="showSearch" :columns="columns" @queryTable="getList" /> -->
-        </el-row>
-
-        <el-table
-          :key="tableKey"
-          v-loading="listLoading"
-          :data="userList"
-          highlight-current-row
-          style=""
-          @sort-change="sortChange"
-          @selection-change="handleSelectionChange"
-        > <el-table-column
-            type="selection"
-            width="55"
-          />
-          <el-table-column prop="userName" label="用户名" align="center" />
-          <el-table-column prop="userClass" label="类别" align="center" />
-          <el-table-column prop="sublibraryName" label="机构名称" align="center" />
-          <el-table-column prop="roleStr" label="角色" align="center" />
-          <el-table-column label="创建时间" width="150px" align="center">
-            <template slot-scope="{row}">
-              <span>{{ row.createTime | createTime('{y}-{m}-{d} {h}:{i}:{s}') }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column align="center" prop="statuss" label="状态" sortable min-width="100">
-            <template slot-scope="row">
-              <el-switch
-                v-model="row.row.status"
-                data-warden-title="用户状态更改"
-                active-value="1"
-                inactive-value="0"
-                active-text="激活"
-                inactive-text="禁用"
-                @change="changeShow(row.row)"
-              />
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" align="center" width="330" class-name="small-padding fixed-width">
-            <template slot-scope="{row,$index}">
-              <el-button
-                v-hasPermi="['system:user:edit']"
-                type="primary"
-                size="mini"
-                style="margin-left: 10px"
-                :disabled="single"
-                @click="handleUpdate(row)"
-              >编辑</el-button>
-              <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="checkChange(row,$index)">
-                删除
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-
-        <!-- 分页器 -->
-        <el-pagination align="center" :current-page="pageNum" :page-sizes="[5,10,20]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+    <el-row :gutter="10" class="mb8">
+      <el-col :span="1.5">
+        <el-button
+          type="primary"
+          plain
+          icon="el-icon-plus"
+          size="mini"
+          @click="handleCreate"
+        >新增</el-button>
       </el-col>
+      <el-col :span="1.5">
+        <el-button
+          :data-warden-title="'删除用户${multipleSelection}'"
+          type="danger"
+          plain
+          icon="el-icon-delete"
+          size="mini"
+          @click="checkChange"
+        >删除</el-button>
+      </el-col>
+      <!-- <right-toolbar :show-search.sync="showSearch" :columns="columns" @queryTable="getList" /> -->
     </el-row>
+
+    <el-table
+      :key="tableKey"
+      v-loading="listLoading"
+      :data="userList"
+      highlight-current-row
+      style=""
+      @sort-change="sortChange"
+      @selection-change="handleSelectionChange"
+    > <el-table-column
+        type="selection"
+        width="55"
+      />
+      <el-table-column prop="username" label="用户名" align="center" />
+      <el-table-column prop="userClass" label="类别" align="center" />
+      <el-table-column prop="roleStr" label="角色" align="center" />
+      <el-table-column label="创建时间" width="150px" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.createTime | createTime('{y}-{m}-{d} {h}:{i}:{s}') }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" prop="statuss" label="状态" sortable min-width="100">
+        <template slot-scope="row">
+          <el-switch
+            v-model="row.row.status"
+            data-warden-title="用户状态更改"
+            active-value="1"
+            inactive-value="0"
+            active-text="激活"
+            inactive-text="禁用"
+            @change="changeShow(row.row)"
+          />
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" width="330" class-name="small-padding fixed-width">
+        <template slot-scope="{row,$index}">
+          <el-button
+            type="primary"
+            size="mini"
+            style="margin-left: 10px"
+            @click="handleUpdate(row)"
+          >编辑</el-button>
+          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="checkChange(row,$index)">
+            删除
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <!-- 分页器 -->
+    <el-pagination align="center" :current-page="pageNum" :page-sizes="[5,10,20]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
 
     <!-- 修改用户信息dialog -->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :center="true" width="800px">
@@ -173,13 +125,13 @@
       <el-form ref="dataForm" :model="temp" :rules="rules" label-position="left" label-width="80px" style="width: 550px; margin-left:50px;">
         <el-row>
           <el-col :span="20">
-            <el-form-item label="用户名" prop="userName">
-              <el-input v-model="temp.userName" />
+            <el-form-item label="用户名" prop="username">
+              <el-input v-model="temp.username" />
             </el-form-item>
           </el-col>
           <el-col :span="20">
-            <el-form-item label="真实姓名" prop="trueName">
-              <el-input v-model="temp.trueName" />
+            <el-form-item label="真实姓名" prop="truename">
+              <el-input v-model="temp.truename" />
             </el-form-item>
           </el-col>
 
@@ -218,13 +170,13 @@
       <el-form ref="dataForm" :model="temp" :rules="rules" label-position="left" label-width="80px" style="width: 550px; margin-left:50px;">
         <el-row>
           <el-col :span="20">
-            <el-form-item label="用户名" prop="userName">
-              <el-input v-model="temp.userName" />
+            <el-form-item label="用户名" prop="username">
+              <el-input v-model="temp.username" />
             </el-form-item>
           </el-col>
           <el-col :span="20">
-            <el-form-item label="真实姓名" prop="trueName">
-              <el-input v-model="temp.trueName" />
+            <el-form-item label="真实姓名" prop="truename">
+              <el-input v-model="temp.truename" />
             </el-form-item>
           </el-col>
           <el-col :span="20">
@@ -256,13 +208,6 @@
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col>
-            <el-form-item label="机构名称" prop="sublibraryId">
-              <el-select v-model="temp.sublibraryId" class="filter-item" placeholder="请选择">
-                <el-option v-for="item in sublibraryList" :key="item.id" :disabled="item.disabled" :label="item.name" :value="item.id" />
-              </el-select>
-            </el-form-item>
-          </el-col>
           <el-col :span="20" />
         </el-row></el-form>
       <div slot="footer" class="dialog-footer">
@@ -288,7 +233,7 @@
 
     <!-- 用户导入对话框 -->
     <el-dialog :title="upload.title" :visible.sync="upload.open" width="400px" append-to-body>
-      <el-form ref="ruleForm" :model="ruleForm" :rules="rules" label-width="80px" class="demo-ruleForm">
+      <el-form ref="ruleForm" :rules="rules" label-width="80px" class="demo-ruleForm">
         <el-form-item label="选择角色">
           <el-select v-model="roleIdList" class="filter-item" placeholder="请选择" style="margin-bottom: 0;margin-left: 10px">
             <el-option v-for="item in roleList" :key="item.id" :label="item.name" :value="item.id" />
@@ -315,18 +260,15 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <!-- <el-button type="primary" @click="submitFileForm">确 定</el-button> -->
         <el-button @click="upload.open = false">关闭</el-button>
       </div>
     </el-dialog>
 
     <!-- 用户角色分配dialog -->
     <el-dialog :visible.sync="operationMessage" width="400px">
-      <el-form ref="ruleForm" :model="ruleForm" :rules="rules" label-width="80px" class="demo-ruleForm">
-        <!-- <el-input v-model="listQuery.title" placeholder="输入子库名称" style="width: 200px;margin-right: 20px" class="filter-item" @keyup.enter.native="handleFilter" />
-        <el-button type="primary" @click="onSubmit"> 搜 索 </el-button> -->
+      <el-form ref="ruleForm" :rules="rules" label-width="80px" class="demo-ruleForm">
         <el-form-item label="当前用户">
-          <el-input v-model="temp.userName" :disabled="true" width="200px" />
+          <el-input v-model="temp.username" :disabled="true" width="200px" />
         </el-form-item>
         <el-form-item label="当前角色">
           <el-input v-model="temp.roleIdList" :disabled="true" width="200px" />
@@ -340,7 +282,7 @@
 
       <span slot="footer" class="dialog-footer">
         <el-button @click="operationMessage = false">取 消</el-button>
-        <el-button :data-warden-title="'用户${temp.userName}增加角色，角色Id为${roleStr}'" type="primary" @click="handleRoleChange">确 定</el-button>
+        <el-button :data-warden-title="'用户${temp.username}增加角色，角色Id为${roleStr}'" type="primary" @click="handleRoleChange">确 定</el-button>
       </span>
     </el-dialog>
     <!-- 确认删除操作消息提示栏 -->
@@ -361,16 +303,8 @@ import md5 from 'js-md5'
 
 import 'echarts-wordcloud/dist/echarts-wordcloud'
 import 'echarts-wordcloud/dist/echarts-wordcloud.min.js'
-import userInportDialog from './components/userInportDialog'
-import userExportDialog from './components/userExportDialog'
 export default {
   name: 'ComplexTable',
-  components: {
-    userExportDialog,
-    userInportDialog
-
-  },
-  directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
@@ -381,6 +315,7 @@ export default {
       return statusMap[status]
     }
   },
+  directives: { waves },
   props: {
     className: {
       type: String,
@@ -437,12 +372,9 @@ export default {
         pageNum: 5,
         name: '',
         startDate: '',
-        endDate: '',
-        sublibraryId: ''
+        endDate: ''
       },
       searchContent: '',
-      sublibraryList: [],
-      sublibraryListAll: [],
       userArrayList: [],
       roleInfo: [],
       userList: [],
@@ -450,13 +382,11 @@ export default {
       pageNum: 1,
       pageSize: 10,
       name: '',
-      sublibraryId: '',
       subjectId: '',
       startDate: '',
       endDate: '',
       value1: '',
       checkedCities: [],
-      subLibrary: '',
       isIndeterminate: true,
       dicts: [],
       deptName: undefined,
@@ -493,7 +423,7 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        userName: undefined,
+        username: undefined,
         phonenumber: undefined,
         status: undefined,
         deptId: undefined
@@ -503,10 +433,9 @@ export default {
         id: undefined,
         roleIdList: [],
         roleStr: [],
-        userName: '',
-        trueName: '',
+        username: '',
+        truename: '',
         sex: '',
-        sublibraryId: '',
         avatar: '',
         status: '',
         importance: 1,
@@ -515,7 +444,6 @@ export default {
         title: '',
         type: '',
         checkedCities: [],
-        subLibrary: '',
         phone: '',
         address: '',
         note: ''
@@ -535,13 +463,12 @@ export default {
         roleIdList: [{ required: true, message: '角色为必选项', trigger: 'change' }],
         roleStr: [{ required: true, message: '角色为必选项', trigger: 'change' }],
         title: [{ required: true, message: 'title is required', trigger: 'blur' }],
-        userName: [{ required: true, message: '用户名为必填项', trigger: 'blur' }],
+        username: [{ required: true, message: '用户名为必填项', trigger: 'blur' }],
         password: [{ required: true, message: '密码为必填项', trigger: 'blur' }],
-        trueName: [{ required: true, message: '真实姓名为必填项', trigger: 'blur' }],
+        truename: [{ required: true, message: '真实姓名为必填项', trigger: 'blur' }],
         sex: [{ required: true, message: '性别为必选项', trigger: 'change' }],
         phone: [{ required: true, message: '电话号码为必填项', trigger: 'blur' },
           { pattern: /^([1][3-9][0-9]{9})$/, message: '输入正确的手机号码', trigger: 'blur' }],
-        sublibraryId: [{ required: true, message: '机构为必选项', trigger: 'change' }],
         address: [{ required: true, message: '地址为必填项', trigger: 'blur' }]
       },
       downloadLoading: false,
@@ -556,7 +483,6 @@ export default {
   },
   created() {
     this.getRoles()
-    this.getSublibraryList()
   },
   beforeDestroy() {
     if (!this.chart) {
@@ -585,19 +511,6 @@ export default {
       this.operationMessage = true
     },
     checkChange(row) {
-    //   if (this.multipleSelection.length === 0) {
-    //     this.$message({
-    //       type: 'error',
-    //       message: '请选择要删除的信息'
-
-      //     })
-      //   } else if (row.id === undefined) {
-      //     this.checkMessage = true
-      //     this.deleteId = row.id
-      //   } else {
-      //     this.checkMessage = true
-      //   }
-
       if (row.id !== undefined) {
         this.checkMessage = true
         this.deleteId = row.id
@@ -639,86 +552,6 @@ export default {
     handleSelectionChange(val) {
       this.multipleSelection = val
     },
-    // 获取图书列表
-    getBookList() {
-      if (this.bookClassify === '全部') {
-        this.bookClassify = ''
-      }
-      this.bookListLoading = true
-      if (this.subjectId === '') {
-        const params = new URLSearchParams()
-        const url = 'manage/bookinfo/getBookList'
-        params.append('pageNum', this.bookPageNum)
-        params.append('pageSize', this.bookPageSize)
-        params.append('bookName', this.bookName)
-        params.append('classify', this.bookClassify)
-        params.append('place', '')
-        params.append('author', '')
-        params.append('order', '')
-        params.append('orderMethod', '')
-        this.$http.post(url, params).then((res) => {
-          if (res.data.status === 200) {
-            this.tableData = res.data.data.bookList
-            console.log(this.tableData)
-            this.sourceTotal = res.data.data.total
-            this.tableData.forEach((item) => {
-              if (item.status === 'submitted') {
-                item.color = 'light'
-              } else if (item.status === 'published') {
-                item.color = 'dark'
-              }
-              item.isShow = String(item.isShow)
-              item.metadata = JSON.parse(item.metadata)
-            })
-          } else {
-            this.tableData = []
-            this.sourceTotal = 0
-            this.$message({
-              type: 'error',
-              message: res.data.message
-            })
-          }
-        })
-      } else {
-        // 获取主题库图书信息
-        this.id = Number(this.$route.query.id)
-        const params = new URLSearchParams()
-        const url = '/manage/subject/getBookFromSubjectNew'
-        params.append('pageNum', this.bookPageNum)
-        params.append('pageSize', this.bookPageSize)
-        params.append('subjectId', this.subjectId)
-        params.append('bookName', this.bookName)
-        params.append('classify', this.bookClassify)
-        params.append('library', '')
-        params.append('author', '')
-        params.append('status', '')
-        params.append('order', '')
-        params.append('orderMethod', '')
-        this.$http.post(url, params).then((res) => {
-          if (res.data.status === 200) {
-            this.tableData = res.data.data.bookList
-            this.sourceTotal = res.data.data.total
-
-            this.tableData.forEach((item, i) => {
-              this.$set(item, 'record_id', item.recordId)
-            })
-            this.tableData.forEach((item) => {
-              item.metadata = JSON.parse(item.metadata)
-            })
-          } else {
-            this.tableData = []
-            this.sourceTotal = 0
-            this.$message({
-              type: 'error',
-              message: res.data.message
-            })
-          }
-        })
-      }
-      setTimeout(() => {
-        this.bookListLoading = false
-      }, 1.5 * 800)
-    },
     // 用户是否放到禁用
     changeShow(row) {
       console.log(row)
@@ -743,30 +576,6 @@ export default {
         }
       })
     },
-    // 获取子库列表
-    getSublibraryList() {
-      this.listLoading = false
-      const params = new URLSearchParams()
-      const url = '/manage/sublibrary/getSublibraryList'
-      params.append('pageNum', this.pageNum)
-      params.append('pageSize', 10 * 10 * 10)
-      params.append('searchContent', this.searchContent)
-
-      this.$http.post(url, params).then((res) => {
-        this.sublibraryList = res.data.data.sublibraryList
-        const newList = {
-          number: '',
-          code: '',
-          name: '全部',
-          description: '',
-          id: '',
-          logolocation: '',
-          isShow: '',
-          disabled: true
-        }
-        this.sublibraryList.unshift(newList)
-      })
-    },
     // 获取用户列表
     getRoles() {
       this.listLoading = true
@@ -778,7 +587,6 @@ export default {
       params.append('name', this.name)
       params.append('startDate', this.dateRange[0])
       params.append('endDate', this.dateRange[1])
-      params.append('sublibraryId', this.sublibraryId)
       this.$http.post(url, params).then((res) => {
         this.userList = res.data.data.userList
 
@@ -789,11 +597,9 @@ export default {
         this.roleInfo = res.data.data.roleinfo
         this.userList.forEach((item, i) => {
           item.status = String(item.status)
-          if (item.sublibraryId === 0) {
-            this.$set(item, 'userClass', '个人用户')
-          } else { this.$set(item, 'userClass', '机构用户') }
+          this.$set(item, 'userClass', '个人用户')
           this.changeUrl(item)
-          this.$set(item, 'roleStr', this.roleInfo[i])
+          // this.$set(item, 'roleStr', this.roleInfo[i])
         })
       })
       setTimeout(() => {
@@ -836,7 +642,6 @@ export default {
     handleNodeClick(data) {
     //   this.userList.groupInfo = data.id
       this.sourceTotal = 0
-      this.sublibraryId = data.id
       this.getRoles()
     },
     handleFilter() {
@@ -913,7 +718,7 @@ export default {
         const params = new URLSearchParams()
         const url = '/users/user/deleteUser'
         params.append('userId', this.deleteId)
-        this.$http.post(url, params).then((res) => {
+        this.$http.delete(url, params).then((res) => {
           if (res.status === 200) {
             this.$message({
               type: 'success',
@@ -933,9 +738,6 @@ export default {
         for (let i = 0; i < this.multipleSelection.length; i++) {
           this.usersList[i] = this.multipleSelection[i].id
         }
-        //   this.userList.forEach((item) => {
-        //     item.id = String(item.status)
-        //   })
         const params = new URLSearchParams()
         console.log('ssss', this.usersList)
         const url = '/users/user/deleteUsers'
@@ -966,14 +768,12 @@ export default {
             const params = new URLSearchParams()
             const url = '/users/user/addOneUser'
             params.append('password', md5(this.temp.password))
-            params.append('userName', this.temp.userName)
-            params.append('trueName', this.temp.trueName)
+            params.append('username', this.temp.username)
+            params.append('truename', this.temp.truename)
             params.append('sex', this.temp.sex)
             params.append('phone', this.temp.phone)
             params.append('address', this.temp.address)
             params.append('roleIdList', this.temp.roleIdList)
-            params.append('sublibraryId', this.temp.sublibraryId)
-            console.log('sss', this.temp.sublibraryId)
             const responseType = 'blob'
             this.$http.post(url, params, responseType).then((res) => {
               if (res.status === 200) {
@@ -991,17 +791,15 @@ export default {
               }
             })
           } else {
-            //   if (isShow === true) { isShow = 1 } else { isShow = 0 }
             const params = new URLSearchParams()
             const url = '/users/user/updateUserAdmin'
             params.append('userId', this.temp.id)
-            params.append('userName', this.temp.userName)
-            params.append('trueName', this.temp.trueName)
+            params.append('username', this.temp.username)
+            params.append('truename', this.temp.truename)
             params.append('sex', this.temp.sex)
             params.append('phone', this.temp.phone)
             params.append('address', this.temp.address)
             params.append('roleIdList', this.temp.roleIdList)
-            params.append('sublibraryId', this.temp.sublibraryId)
             const responseType = 'blob'
             this.$http.post(url, params, responseType).then((res) => {
               if (res.data.status === 200) {
@@ -1051,20 +849,15 @@ export default {
         reader.readAsBinaryString(file)
         reader.onload = (e) => {
         // 读取文件内容
-        // const fileString = e
-        // 接下来可对文件内容进行处理
-        // console.log(fileString)
           const data = e.target.result
           const workbook = XLSX.read(data, { type: 'binary' })
           const worksheet = workbook.Sheets[workbook.SheetNames[0]]
-          const fields = ['userName', 'trueName', 'sex', 'phone', 'address', 'note']
+          const fields = ['username', 'truename', 'sex', 'phone', 'address', 'note']
           const excelData = XLSX.utils.sheet_to_json(worksheet, { header: fields })
           excelData.shift()
           console.log('excel', excelData)
           console.log('json数据', JSON.stringify(excelData))
           console.log('roleId', this.roleStr)
-          // const treeData = this.totree(excelData)
-          // console.log('excel2', treeData)
           const params = new URLSearchParams()
           const url = '/users/user/importUser'
           // params.append('bookId', this.bookId)
@@ -1105,19 +898,6 @@ export default {
     getSortClass: function(key) {
       const sort = this.listQuery.sort
       return sort === `+${key}` ? 'ascending' : 'descending'
-    },
-    // 图书页大小
-    handleBookSizeChange(val) {
-      console.log(`每页 ${val} 条`)
-      this.bookPageNum = 1
-      this.bookPageSize = val
-      this.getBookList()
-    },
-    // 图书页跳转
-    handleBookCurrentChange(val) {
-      console.log(`当前页: ${val}`)
-      this.bookPageNum = val
-      this.getBookList()
     },
     // y用户列表大小
     handleSizeChange(val) {
