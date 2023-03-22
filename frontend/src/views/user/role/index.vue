@@ -61,7 +61,7 @@
         <el-button @click="dialogFormVisible = false">
           取消
         </el-button>
-        <el-button :data-warden-title="`角色信息修改添加，角色名称${temp.name}`" type="primary" @click="updateSublibrary">
+        <el-button :data-warden-title="`角色信息修改添加，角色名称${temp.name}`" type="primary" @click="addOrUpdateRole">
           确认
         </el-button>
       </div>
@@ -213,7 +213,7 @@ export default {
       }, 1.5 * 1000)
     },
     // 添加角色
-    updateSublibrary() {
+    addOrUpdateRole() {
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
           if (this.temp.id === undefined) {
@@ -228,12 +228,12 @@ export default {
                   message: '添加成功!'
                 })
                 this.getRoles()
-              } else {
-                this.$message({
-                  type: 'error',
-                  message: '添加失败!'
-                })
               }
+            }).catch(() => {
+              this.$message({
+                type: 'error',
+                message: '添加失败!'
+              })
             })
             this.dialogFormVisible = false
           } else {
@@ -242,19 +242,19 @@ export default {
             formate.append('name', this.temp.name)
             formate.append('description', this.temp.description)
             const url = '/users/role/updateRole'
-            this.$http.post(url, formate).then((res) => {
+            this.$http.put(url, formate).then((res) => {
               if (res.status === 200) {
                 this.$message({
                   type: 'success',
                   message: '修改成功!'
                 })
                 this.getRoles()
-              } else {
-                this.$message({
-                  type: 'error',
-                  message: '修改失败!'
-                })
               }
+            }).catch(() => {
+              this.$message({
+                type: 'error',
+                message: '修改失败!'
+              })
             })
             this.dialogFormVisible = false
           }
