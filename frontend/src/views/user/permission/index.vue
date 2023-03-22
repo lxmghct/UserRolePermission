@@ -1,10 +1,4 @@
-<!--
- * @FileDescription: 权限
- * @Author: 庞志扬
- * @Date: 2022/11/14
- * @LastEditors: 庞志扬
- * @LastEditTime: 2022/11/14
- -->
+
 <template>
   <div class="app-container">
     <el-select
@@ -82,7 +76,6 @@ export default {
         loading: false,
         total: 0
       },
-      roleList: [],
       permissionTree: [],
       permissionIdList: []
     }
@@ -249,7 +242,7 @@ export default {
     handleCheckChange(row) {
       // 子级全选/全不选
       this.checkAllChildren(row, row.checked)
-      // 父级检查是否全选
+      // 子级勾选时，父级也勾选
       this.checkParentNode(row, row.checked)
     },
 

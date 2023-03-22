@@ -20,20 +20,6 @@ import './permission' // permission control
 import * as filters from './filters' // global filters
 Vue.prototype.HOST = 'http://localhost:8095/'
 
-// 路由采集插件
-import tracing from 'web-tracing'
-Vue.use(tracing, {
-  requestUrl: 'manage/operatingLog/importOperatingLog',
-  appName: '管理系统',
-  event: {
-    core: true,
-    unload: false
-  },
-  // eslint-disable-next-line no-undef
-  ext: { ip: localStorage.getItem('Ip') }
-})
-tracing.setUserUuid(localStorage.getItem('userId'))
-
 Vue.use(Element, {
   size: Cookies.get('size') || 'medium', // set element-ui default size
   locale: enLang // 如果使用中文，无需设置，请删除
