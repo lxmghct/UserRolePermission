@@ -67,7 +67,7 @@ public class UserController {
             //3.3获取对象
             user = (User) authentication.getPrincipal();
         } catch (Exception e) {
-            System.out.println(e.getMessage() );
+            System.out.println(e.getMessage());
             if (e instanceof BadCredentialsException) {
                 //3.4用户名或密码错误
                 return ResponseVO.error(CodeEnum.ERROR, "用户名或密码错误");
@@ -161,16 +161,22 @@ public class UserController {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         //1.统计用户总数
         long total = userService.count(wrapper);
-        //2.limit分页查询用户，并按照创建时间降序排序
+        //2.获取开始页
         int startNum = (pageNum - 1) * pageSize;
-        wrapper.last("limit" + " " + startNum + "," + pageSize).orderByDesc("create_time");
-        List<User> userList = userService.list(wrapper);
-        //3.封装返回的对象
+        //3.查询所有用户
+        List<User> userList = null;
+        try {
+            userList = userService.searchUserList(startNum, pageSize);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseVO.error();
+        }
+        //4.封装返回值
         HashMap<String, Object> map = new HashMap<>();
         map.put("userList", userList);
         map.put("total", total);
+        return ResponseVO.success(map);
 
-        return ResponseVO.success(CodeEnum.SUCCESS, map);
     }
 
 
@@ -191,5 +197,60 @@ public class UserController {
             return ResponseVO.success(CodeEnum.SUCCESS);
         }
         return ResponseVO.error(CodeEnum.ERROR);
+    }
+
+
+    /**
+     * 新增用户
+     * @param username
+     * @param truename
+     * @param password
+     * @param sex
+     * @param phone
+     * @param address
+     * @param roleIdList
+     * @return
+     */
+    @PostMapping("/addUser")
+    @PreAuthorize("hasAuthority('MAN_USER')")
+    public ResponseVO<Map> addOneUser(@RequestParam(value = "username", required = true) String username,
+                                      @RequestParam(value = "truename", required = true) String truename,
+                                      @RequestParam(value = "password", required = true) String password,
+                                      @RequestParam(value = "sex", required = true) String sex,
+                                      @RequestParam(value = "phone", required = true) String phone,
+                                      @RequestParam(value = "address", required = true) String address,
+                                      @RequestParam(value = "roleIdList", required = true) List<Integer> roleIdList) {
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.eq("username", username);
+        //1.查询是否存在重名用户
+        User user = userService.getOne(userQueryWrapper);
+        if (user != null) {
+            return ResponseVO.error(CodeEnum.ERROR, "用户名已存在");
+        }
+        user = new User();
+        user.setId(null)
+                .setUsername(username)
+                .setTruename(truename)
+                .setSex(sex)
+                .setPhone(phone)
+                .setAddress(address)
+                .setNote("")
+                .setPassword(password)
+                .setStatus(1)
+                .setCreateTime(new Date())
+                .setAvatar("defalut.jpg");
+        //2.添加新用户
+        if (userService.save(user)) {
+            //3.添加用户成功后，添加用户与角色的对应关系
+            int userId = userService.getOne(userQueryWrapper).getId();
+            for (int i = 0; i < roleIdList.size(); i++) {
+                UserRole userRole = new UserRole();
+                userRole.setUserId(userId)
+                        .setCreateTime(new Date())
+                        .setRoleId(roleIdList.get(i));
+                userRoleService.save(userRole);
+            }
+        }
+        return ResponseVO.success(CodeEnum.SUCCESS, "用户新增成功");
     }
 }

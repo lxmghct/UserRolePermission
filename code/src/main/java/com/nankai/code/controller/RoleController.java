@@ -57,7 +57,6 @@ public class RoleController {
             role = new Role();
             role.setName(name);
             role.setDescription(description);
-            role.setStatus(1);
             role.setCreateTime(new Date());
             //2.添加新角色
             roleService.save(role);
