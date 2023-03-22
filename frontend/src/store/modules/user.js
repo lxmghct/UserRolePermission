@@ -48,6 +48,7 @@ const actions = {
         commit('SET_ID', response.data.user.id)
         localStorage.setItem('userId', response.data.user.id)
         const componentSet = new Set()
+        componentSet.add('')
         if (response.data.component) {
           response.data.component.forEach(item => {
             const temp = item.replace(/^\//, '').replace(/\/$/, '').replace(/^system\//, '')
