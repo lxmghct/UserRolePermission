@@ -121,7 +121,7 @@ public class UserController {
      * @return
      */
     @PutMapping("/updateUserRoles")
-    @PreAuthorize("hasAuthority('MAN_USER')")
+    @PreAuthorize("hasAuthority('MAN_USER_MODIFY')")
     public ResponseVO<Map> updateUserRoles(@RequestParam(value = "userId", required = true) Integer userId,
                                            @RequestParam(value = "roleIdList", required = true) List<Integer> roleIdList) {
         //1.前置检验
@@ -155,7 +155,7 @@ public class UserController {
      * @throws ParseException
      */
     @PostMapping("/searchUserList")
-    @PreAuthorize("hasAuthority('MAN_USER')")
+    @PreAuthorize("hasAuthority('MAN_USER_LIST')")
     public ResponseVO<Map> searchUserList(@RequestParam(value = "pageNum", required = true) int pageNum,
                                           @RequestParam(value = "pageSize", required = true) int pageSize) throws ParseException {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
@@ -187,7 +187,7 @@ public class UserController {
      * @return
      */
     @DeleteMapping("/deleteUser")
-    @PreAuthorize("hasAuthority('MAN_USER')")
+    @PreAuthorize("hasAuthority('MAN_USER_MODIFY')")
     public ResponseVO<Integer> deleteUser(@RequestParam(value = "userId", required = true) int userId) {
 
         QueryWrapper<UserRole> userRoleQueryWrapper = new QueryWrapper<>();
@@ -213,7 +213,7 @@ public class UserController {
      * @return
      */
     @PostMapping("/addUser")
-    @PreAuthorize("hasAuthority('MAN_USER')")
+    @PreAuthorize("hasAuthority('MAN_USER_MODIFY')")
     public ResponseVO<Map> addOneUser(@RequestParam(value = "username", required = true) String username,
                                       @RequestParam(value = "truename", required = true) String truename,
                                       @RequestParam(value = "password", required = true) String password,
