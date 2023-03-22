@@ -74,6 +74,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .accessDeniedHandler(userAccessDeniedHandler);
         //登出
         http.logout()
+                .logoutUrl("/user/logout")
                 .deleteCookies("Authorization");
 
         // 在UsernamePassword过滤器之前添加JWT过滤器

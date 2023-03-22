@@ -202,6 +202,7 @@ public class UserController {
 
     /**
      * 新增用户
+     *
      * @param username
      * @param truename
      * @param password
@@ -252,5 +253,16 @@ public class UserController {
             }
         }
         return ResponseVO.success(CodeEnum.SUCCESS, "用户新增成功");
+    }
+
+
+    /**
+     * 登出
+     *
+     * @return
+     */
+    @PostMapping("/logout")
+    public ResponseVO logout() {
+        return ResponseVO.success();
     }
 }
