@@ -5,10 +5,10 @@ spring:
   application:
     name: user
   datasource:
-    url: jdbc:mysql://192.168.23.136:3309/mb_user?useUnicode=true&characterEncoding=utf-8
+    url: jdbc:mysql://47.106.217.8:3306/mb_user?useUnicode=true&characterEncoding=utf-8
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: nankai
+    password: shanxi_password
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
