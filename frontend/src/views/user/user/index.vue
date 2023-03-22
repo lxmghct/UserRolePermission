@@ -229,9 +229,8 @@ export default {
   },
   methods: {
     deleteUsers(userIdList) {
-      const params = { params: { userId: userIdList[0] }}
-      const url = '/users/user/deleteUser'
-      this.$http.delete(url, params).then((res) => {
+      const url = '/users/user/deleteUser?' + userIdList.map(item => 'userIdList=' + item).join('&')
+      this.$http.delete(url).then((res) => {
         if (res.status === 200) {
           this.$message({
             type: 'success',

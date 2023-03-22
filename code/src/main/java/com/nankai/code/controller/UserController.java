@@ -14,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -183,17 +184,15 @@ public class UserController {
     /**
      * 删除用户
      *
-     * @param userId
+     * @param userIdList
      * @return
      */
     @DeleteMapping("/deleteUser")
     @PreAuthorize("hasAuthority('MAN_USER_DELETE')")
-    public ResponseVO<Integer> deleteUser(@RequestParam(value = "userId", required = true) int userId) {
-
-        QueryWrapper<UserRole> userRoleQueryWrapper = new QueryWrapper<>();
-        userRoleQueryWrapper.eq("user_id", userId);
-        userRoleService.remove(userRoleQueryWrapper);
-        if (userService.removeById(userId)) {
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseVO<Integer> deleteUser(@RequestParam(value = "userIdList", required = true) List<Integer> userIdList) {
+        userRoleService.remove(new QueryWrapper<UserRole>().in("user_id", userIdList));
+        if (userService.removeByIds(userIdList)) {
             return ResponseVO.success(CodeEnum.SUCCESS);
         }
         return ResponseVO.error(CodeEnum.ERROR);
