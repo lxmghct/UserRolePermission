@@ -16,7 +16,6 @@ import router from './router'
 
 import './icons' // icon
 import './permission' // permission control
-// import './utils/error-log' // error log
 
 import * as filters from './filters' // global filters
 Vue.prototype.HOST = 'http://localhost:8095/'
@@ -33,15 +32,6 @@ Vue.use(tracing, {
   // eslint-disable-next-line no-undef
   ext: { ip: localStorage.getItem('Ip') }
 })
-// tracing.tracePageView({
-//   url: '自定义URL',
-//   referer: '自定义上级URL',
-//   actions: 'reserved',
-//   params: {
-//     userId: localStorage.getItem('userId'),
-//     appName: 'manage'
-//   }
-// })
 tracing.setUserUuid(localStorage.getItem('userId'))
 
 Vue.use(Element, {
@@ -75,5 +65,21 @@ axios.interceptors.request.use(
   },
   err => {
     return Promise.reject(err)
+  }
+)
+
+// axios若返回非200状态码, 则message提示
+axios.interceptors.response.use(
+  (res) => {
+    if (res.data.status !== 200) {
+      Element.Message.error(res.data.message)
+      return Promise.reject(res)
+    } else {
+      return res
+    }
+  },
+  (error) => {
+    // Element.Message.error('请求失败，请稍后重试')
+    return Promise.reject(error)
   }
 )
