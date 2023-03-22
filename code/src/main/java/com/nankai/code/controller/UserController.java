@@ -121,7 +121,7 @@ public class UserController {
      * @return
      */
     @PutMapping("/updateUserRoles")
-    @PreAuthorize("hasAuthority('MAN_USER_MODIFY')")
+    @PreAuthorize("hasAuthority('MAN_USER_MODIFY_ROLE')")
     public ResponseVO<Map> updateUserRoles(@RequestParam(value = "userId", required = true) Integer userId,
                                            @RequestParam(value = "roleIdList", required = true) List<Integer> roleIdList) {
         //1.前置检验
@@ -155,7 +155,7 @@ public class UserController {
      * @throws ParseException
      */
     @PostMapping("/searchUserList")
-    @PreAuthorize("hasAuthority('MAN_USER_LIST')")
+    @PreAuthorize("hasAuthority('MAN_USER')")
     public ResponseVO<Map> searchUserList(@RequestParam(value = "pageNum", required = true) int pageNum,
                                           @RequestParam(value = "pageSize", required = true) int pageSize) throws ParseException {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
@@ -187,7 +187,7 @@ public class UserController {
      * @return
      */
     @DeleteMapping("/deleteUser")
-    @PreAuthorize("hasAuthority('MAN_USER_MODIFY')")
+    @PreAuthorize("hasAuthority('MAN_USER_DELETE')")
     public ResponseVO<Integer> deleteUser(@RequestParam(value = "userId", required = true) int userId) {
 
         QueryWrapper<UserRole> userRoleQueryWrapper = new QueryWrapper<>();
@@ -209,18 +209,16 @@ public class UserController {
      * @param sex
      * @param phone
      * @param address
-     * @param roleIdList
      * @return
      */
     @PostMapping("/addUser")
-    @PreAuthorize("hasAuthority('MAN_USER_MODIFY')")
+    @PreAuthorize("hasAuthority('MAN_USER_ADD')")
     public ResponseVO<Map> addOneUser(@RequestParam(value = "username", required = true) String username,
                                       @RequestParam(value = "truename", required = true) String truename,
                                       @RequestParam(value = "password", required = true) String password,
                                       @RequestParam(value = "sex", required = true) String sex,
                                       @RequestParam(value = "phone", required = true) String phone,
-                                      @RequestParam(value = "address", required = true) String address,
-                                      @RequestParam(value = "roleIdList", required = true) List<Integer> roleIdList) {
+                                      @RequestParam(value = "address", required = true) String address) {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
         userQueryWrapper.eq("username", username);
         //1.查询是否存在重名用户
@@ -242,17 +240,10 @@ public class UserController {
                 .setAvatar("defalut.jpg");
         //2.添加新用户
         if (userService.save(user)) {
-            //3.添加用户成功后，添加用户与角色的对应关系
-            int userId = userService.getOne(userQueryWrapper).getId();
-            for (int i = 0; i < roleIdList.size(); i++) {
-                UserRole userRole = new UserRole();
-                userRole.setUserId(userId)
-                        .setCreateTime(new Date())
-                        .setRoleId(roleIdList.get(i));
-                userRoleService.save(userRole);
-            }
+            return ResponseVO.success(CodeEnum.SUCCESS, "用户新增成功");
         }
-        return ResponseVO.success(CodeEnum.SUCCESS, "用户新增成功");
+        return ResponseVO.success(CodeEnum.SUCCESS, "用户新增失败");
+
     }
 
 

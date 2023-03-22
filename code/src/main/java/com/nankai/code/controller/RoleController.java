@@ -98,7 +98,7 @@ public class RoleController {
      * @return
      */
     @PostMapping("/getRoleList")
-    @PreAuthorize("hasAuthority('MAN_ROLE')")
+    @PreAuthorize("hasAnyAuthority('MAN_ROLE','MAN_USER_ADD','MAN_USER_MODIFY_ROLE')")
     public ResponseVO<Map> getRoleList(@RequestParam(value = "pageNum", required = true) int pageNum,
                                        @RequestParam(value = "pageSize", required = true) int pageSize) {
         QueryWrapper<Role> wrapper = new QueryWrapper<>();
@@ -166,5 +166,11 @@ public class RoleController {
         String[] roleNames = role.split(",");
 
         return permissionService.roleAccessComponent(component, roleNames);
+    }
+
+
+    public ResponseVO addUserRole(@RequestParam("userId") Integer userId,
+                                  @RequestParam("roleIdList") List<Integer> roleIdList) {
+        return userRoleService.addUserRole(userId,roleIdList);
     }
 }

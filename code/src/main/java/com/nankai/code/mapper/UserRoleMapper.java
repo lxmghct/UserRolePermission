@@ -2,6 +2,7 @@ package com.nankai.code.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.nankai.code.common.UserRole;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -17,4 +18,7 @@ public interface UserRoleMapper extends BaseMapper<UserRole> {
 
     @Select("select role_id from user_role where user_id =#{uid}")
     List<Integer> getRoleIdsByUserId(Integer uid);
+
+    @Insert("")
+    void addUserRole(Integer userId, List<Integer> roleIdList);
 }
