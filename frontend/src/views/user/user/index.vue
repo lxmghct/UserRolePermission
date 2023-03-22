@@ -285,13 +285,6 @@
         <el-button :data-warden-title="'用户${temp.username}增加角色，角色Id为${roleStr}'" type="primary" @click="handleRoleChange">确 定</el-button>
       </span>
     </el-dialog>
-    <!-- 确认删除操作消息提示栏 -->
-    <el-dialog :visible.sync="checkMessage" width="400px" title="确认该操作？">
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="checkMessage = false">取 消</el-button>
-        <el-button type="primary" @click="handleDeleteUsers">确 定</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
@@ -344,7 +337,6 @@ export default {
       value: '',
       msg: 'Welcome to Your Vue.js App',
       dateRange: ['', ''],
-      checkMessage: false, // 删除确认弹窗
       operationMessage: false, // 权限弹窗
       roleStr: [],
       roleList: [],
@@ -511,17 +503,25 @@ export default {
     },
     checkChange(row) {
       if (row.id !== undefined) {
-        this.checkMessage = true
-        this.deleteId = row.id
+        this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.handleDeleteUsers(row.id)
+        }).catch((e) => {
+          console.error(e)
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
       } else {
         if (this.multipleSelection.length === 0) {
           this.$message({
             type: 'error',
             message: '请选择要删除的信息'
-
           })
-        } else {
-          this.checkMessage = true
         }
       }
     },
@@ -553,27 +553,11 @@ export default {
     },
     // 用户是否放到禁用
     changeShow(row) {
-      console.log(row)
-      //   if (isShow === true) { isShow = 1 } else { isShow = 0 }
-      const params = new URLSearchParams()
-      const url = '/users/user/updateUserStatus'
-      params.append('userId', row.id)
-      params.append('status', Number(row.status))
-      const responseType = 'blob'
-      this.$http.post(url, params, responseType).then((res) => {
-        if (res.status === 200) {
-          this.$message({
-            type: 'success',
-            message: '修改成功!'
-          })
-          this.getRoles()
-        } else {
-          this.$message({
-            type: 'error',
-            message: '修改失败!'
-          })
-        }
+      this.$message({
+        type: 'warning',
+        message: '暂不支持修改'
       })
+      row.status = row.status === '1' ? '0' : '1'
     },
     // 获取用户列表
     getRoles() {
@@ -596,7 +580,7 @@ export default {
         this.userList.forEach((item, i) => {
           item.status = String(item.status)
           this.$set(item, 'userClass', '个人用户')
-          this.changeUrl(item)
+          // this.changeUrl(item)
           this.$set(item, 'roleStr', item.roleNameList.join(',') || '无')
         })
       })
@@ -711,11 +695,10 @@ export default {
       this.handleQuery()
     },
     // 删除用户
-    handleDeleteUsers() {
-      if (this.deleteId !== undefined) {
-        const params = new URLSearchParams()
+    handleDeleteUsers(id) {
+      if (id !== undefined) {
+        const params = { params: { userId: id }}
         const url = '/users/user/deleteUser'
-        params.append('userId', this.deleteId)
         this.$http.delete(url, params).then((res) => {
           if (res.status === 200) {
             this.$message({
@@ -723,13 +706,7 @@ export default {
               message: '删除成功!'
 
             })
-            this.checkMessage = false
             this.getRoles()
-          } else {
-            this.$message({
-              type: 'error',
-              message: '删除失败!'
-            })
           }
         })
       } else {
@@ -747,7 +724,6 @@ export default {
               message: '删除成功!'
 
             })
-            this.checkMessage = false
             this.getRoles()
           } else {
             this.$message({
@@ -764,7 +740,7 @@ export default {
         if (valid) {
           if (this.temp.id === undefined) {
             const params = new URLSearchParams()
-            const url = '/users/user/addOneUser'
+            const url = '/users/user/addUser'
             params.append('password', md5(this.temp.password))
             params.append('username', this.temp.username)
             params.append('truename', this.temp.truename)

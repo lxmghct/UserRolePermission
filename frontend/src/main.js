@@ -79,7 +79,7 @@ axios.interceptors.response.use(
     }
   },
   (error) => {
-    // Element.Message.error('请求失败，请稍后重试')
+    Element.Message.error('请求失败，请稍后重试')
     return Promise.reject(error)
   }
 )

@@ -67,7 +67,7 @@ export default {
     ])
   },
   mounted() {
-    this.getAvator()
+    // this.getAvator()
   },
   methods: {
     getAvator() {

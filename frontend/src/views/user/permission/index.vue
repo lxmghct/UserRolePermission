@@ -144,14 +144,7 @@ export default {
         const data = res.data.data
         data.forEach(item => { item.checked = false })
         // 根据id和parentId构建树形结构
-        const processData = data.filter(item => item.system === '数据加工系统')
-        const manageData = data.filter(item => item.system === '数据管理系统')
-        const showData = data.filter(item => item.system === '数据展示平台')
-        this.permissionTree = [
-          { id: -1, name: '数据加工系统', classify: 'system', children: this.buildTreeByList(processData) },
-          { id: -2, name: '数据管理系统', classify: 'system', children: this.buildTreeByList(manageData) },
-          { id: -3, name: '数据展示平台', classify: 'system', children: this.buildTreeByList(showData) }
-        ]
+        this.permissionTree = this.buildTreeByList(data)
         if (this.permissionIdList.length > 0) {
           this.changePermissionCheckStatus(this.permissionIdList)
         }
