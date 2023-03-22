@@ -8,6 +8,7 @@ import com.nankai.code.common.vo.ResponseVO;
 import com.nankai.code.service.PermissionService;
 import com.nankai.code.service.RolePermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 import java.util.List;
@@ -34,6 +35,7 @@ public class PermissionController {
      * @return
      */
     @PostMapping("/addPermission")
+    @PreAuthorize("hasAuthority('MAN_PERM')")
     public ResponseVO<Map> addPermission(@RequestParam(value = "name") String name,
                                          @RequestParam(value = "description") String description,
                                          @RequestParam(value = "classify") String classify,
@@ -70,6 +72,7 @@ public class PermissionController {
      * @return
      */
     @DeleteMapping("/deletePermission")
+    @PreAuthorize("hasAuthority('MAN_PERM')")
     public ResponseVO<Map> deletePermission(@RequestParam(value = "id") Integer id) {
 
         QueryWrapper<RolePermission> queryWrapper = new QueryWrapper<>();
@@ -91,6 +94,7 @@ public class PermissionController {
      * @return
      */
     @GetMapping("/getAllPermissions")
+    @PreAuthorize("hasAuthority('MAN_PERM')")
     public ResponseVO<List<Permission>> getAllPermissions() {
         return permissionService.selectAllPermissions();
     }

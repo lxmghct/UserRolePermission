@@ -17,7 +17,7 @@ public interface PermissionMapper extends BaseMapper<Permission> {
             "left join role_permission as rp on p.id=rp.permission_id " +
             "left join user_role as ur on rp.role_id=ur.role_id " +
             "left join user as u on ur.user_id=u.id " +
-            "where u.user_name=#{username} and p.classify='页面权限' and p.system=#{system}")
+            "where u.username=#{username} and p.classify='页面权限' and p.system=#{system}")
     public List<String> selectComponentsByUsernameAndSystem(String username, String system);
 
     @Select("select * from permission order by system,classify")

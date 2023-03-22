@@ -12,6 +12,7 @@ import com.nankai.code.service.RolePermissionService;
 import com.nankai.code.service.RoleService;
 import com.nankai.code.service.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -41,6 +42,7 @@ public class RoleController {
      * @return
      */
     @PostMapping("/addRole")
+    @PreAuthorize("hasAuthority('MAN_ROLE')")
     public ResponseVO<Map> addRole(@RequestParam(value = "name") String name,
                                    @RequestParam(value = "description") String description) {
         QueryWrapper<Role> queryWrapper = new QueryWrapper<>();
@@ -71,6 +73,7 @@ public class RoleController {
      * @return
      */
     @DeleteMapping("/deleteRole")
+    @PreAuthorize("hasAuthority('MAN_ROLE')")
     public ResponseVO<Map> deleteRole(@RequestParam(value = "id") int id) {
         Role role = roleService.getById(id);
         QueryWrapper<UserRole> wrapper = new QueryWrapper<>();
@@ -96,6 +99,7 @@ public class RoleController {
      * @return
      */
     @PostMapping("/getRoleList")
+    @PreAuthorize("hasAuthority('MAN_ROLE')")
     public ResponseVO<Map> getRoleList(@RequestParam(value = "pageNum", required = true) int pageNum,
                                        @RequestParam(value = "pageSize", required = true) int pageSize) {
         QueryWrapper<Role> wrapper = new QueryWrapper<>();
@@ -122,6 +126,7 @@ public class RoleController {
      * @return
      */
     @PostMapping("/getPermissionsByRoleId")
+    @PreAuthorize("hasAuthority('MAN_ROLE')")
     public ResponseVO<List<Permission>> getPermissionsByRoleId(@RequestParam("roleId") Integer roleId) {
         if (roleId == null)
             return ResponseVO.error(CodeEnum.ERROR, "输入角色编号不能为空");
@@ -136,6 +141,7 @@ public class RoleController {
      * @return
      */
     @PutMapping("/updateRolePermissions")
+    @PreAuthorize("hasAuthority('MAN_ROLE')")
     public ResponseVO updateRolePermissions(@RequestParam("roleId") Integer roleId,
                                             @RequestParam("permissionIds") List<Integer> permissionIds) {
         //1.前置检验
@@ -155,6 +161,7 @@ public class RoleController {
      * @return
      */
     @PostMapping("/roleAccessComponent")
+    @PreAuthorize("hasAuthority('MAN_ROLE')")
     public ResponseVO roleAccessComponent(@RequestParam("component") String component, @RequestHeader("Authorization") String token) {
         String role = TokenUtil.getRoleFromToken(token);
         String[] roleNames = role.split(",");

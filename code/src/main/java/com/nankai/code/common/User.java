@@ -1,5 +1,6 @@
 package com.nankai.code.common;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -29,8 +30,11 @@ public class User implements Serializable, UserDetails {
     private String phone;
     private String address;
     private String note;
+    @TableField(exist = false)
     private Set<String> permissions;
+    @TableField(exist = false)
     private List<String> roleNameList;
+    @TableField(exist = false)
     private List<GrantedAuthority> grantedAuthorities;
 
     public List<String> getRoleNameList() {
