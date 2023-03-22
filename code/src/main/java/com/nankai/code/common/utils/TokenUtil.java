@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.nankai.code.common.User;
+
 import java.util.Date;
 
 
@@ -22,8 +23,9 @@ public class TokenUtil {
 
             token = JWT.create()
                     .withIssuer("auth0")
-                    .withClaim("user_id", user.getId())
-                    .withClaim("user_name", user.getUsername())
+                    .withClaim("id", user.getId())
+                    .withClaim("username", user.getUsername())
+                    .withClaim("password", user.getPassword())
                     .withClaim("role", role)
                     .withClaim("permission", permission)
                     .withExpiresAt(expiresAt)
@@ -41,7 +43,7 @@ public class TokenUtil {
     public static String getUsernameFromToken(String token) {
         try {
             DecodedJWT jwt = JWT.decode(token);
-            return jwt.getClaim("user_name").asString();
+            return jwt.getClaim("username").asString();
         } catch (JWTDecodeException e) {
             return null;
         }

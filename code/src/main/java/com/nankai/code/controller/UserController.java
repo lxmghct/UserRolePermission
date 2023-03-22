@@ -9,6 +9,7 @@ import com.nankai.code.common.vo.ResponseVO;
 import com.nankai.code.service.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,9 +27,6 @@ public class UserController {
     private UserService userService;
 
     @Autowired
-    private RoleService roleService;
-
-    @Autowired
     private UserRoleService userRoleService;
 
     @Autowired
@@ -42,14 +40,12 @@ public class UserController {
      *
      * @param username
      * @param password
-     * @param ip
      * @param system
      * @return
      */
     @PostMapping("/login")
     public ResponseVO<Map> login(@RequestParam(value = "username") String username,
                                  @RequestParam(value = "password") String password,
-                                 @RequestParam(value = "ip") String ip,
                                  @RequestParam(value = "system") String system) {
         //1.登录前置校验
         if (loginPreCheck(username, password)) {
@@ -124,6 +120,7 @@ public class UserController {
      * @return
      */
     @PutMapping("/updateUserRoles")
+    @PreAuthorize("hasAuthority('MAN_USER')")
     public ResponseVO<Map> updateUserRoles(@RequestParam(value = "userId", required = true) Integer userId,
                                            @RequestParam(value = "roleIdList", required = true) List<Integer> roleIdList) {
         //1.前置检验
@@ -157,6 +154,7 @@ public class UserController {
      * @throws ParseException
      */
     @PostMapping("/searchUserList")
+    @PreAuthorize("hasAuthority('MAN_USER')")
     public ResponseVO<Map> searchUserList(@RequestParam(value = "pageNum", required = true) int pageNum,
                                           @RequestParam(value = "pageSize", required = true) int pageSize) throws ParseException {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
@@ -182,6 +180,7 @@ public class UserController {
      * @return
      */
     @DeleteMapping("/deleteUser")
+    @PreAuthorize("hasAuthority('MAN_USER')")
     public ResponseVO<Integer> deleteUser(@RequestParam(value = "userId", required = true) int userId) {
 
         QueryWrapper<UserRole> userRoleQueryWrapper = new QueryWrapper<>();

@@ -11,7 +11,7 @@ import java.util.List;
 public interface UserRoleMapper extends BaseMapper<UserRole> {
 
 
-    @Select("SELECT role.name FROM user_role LEFT JOIN role on role.id=user_role.role_id WHERE user_role.user_id=${userId} and role.status=1")
+    @Select("SELECT role.name FROM user_role LEFT JOIN role on role.id=user_role.role_id WHERE user_role.user_id=#{userId}")
     List<String> getRoleNameByUserId(Integer userId);
 
 

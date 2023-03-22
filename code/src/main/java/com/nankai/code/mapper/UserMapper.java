@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
 
-    @Select("select id,user_name as userName,password,sublibrary_id,true_name as trueName,avatar,status,remaning,phone,address,note,login_time,create_time,sex from user where user_name=#{username}")
+    @Select("select id,username,password,truename,avatar,status,phone,address,note,login_time,create_time,sex from user where username=#{username}")
     public User getUserByUsername(String username);
 
 }
