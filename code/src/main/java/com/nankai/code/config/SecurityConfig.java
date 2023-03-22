@@ -72,7 +72,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(anonymousAuthenticationEntryPoint)
                 //2.2登录的用户没有权限的处理
                 .accessDeniedHandler(userAccessDeniedHandler);
-        //todo:登出
+        //登出
+        http.logout()
+                .deleteCookies("Authorization");
 
         // 在UsernamePassword过滤器之前添加JWT过滤器
         // 添加JWTfilter
