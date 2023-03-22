@@ -376,7 +376,6 @@ export default {
       },
       searchContent: '',
       userArrayList: [],
-      roleInfo: [],
       userList: [],
       userLists: [],
       pageNum: 1,
@@ -594,12 +593,11 @@ export default {
         if (this.total === undefined) {
           this.total = 0
         }
-        this.roleInfo = res.data.data.roleinfo
         this.userList.forEach((item, i) => {
           item.status = String(item.status)
           this.$set(item, 'userClass', '个人用户')
           this.changeUrl(item)
-          // this.$set(item, 'roleStr', this.roleInfo[i])
+          this.$set(item, 'roleStr', item.roleNameList.join(',') || '无')
         })
       })
       setTimeout(() => {
