@@ -23,7 +23,7 @@ public interface PermissionMapper extends BaseMapper<Permission> {
     @Select("select * from permission order by `system`,classify")
     public List<Permission> selectAllPermissions();
 
-    @Select("select * from permission where id in (select permission_id from role_permission where role_id=#{roleId}) order by system,classify;")
+    @Select("select * from permission where id in (select permission_id from role_permission where role_id=#{roleId}) order by `system`,classify;")
     List<Permission> getPermissionsByRoleId(Integer roleId);
 
     @Select("<script>" +
