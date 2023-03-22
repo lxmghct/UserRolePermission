@@ -71,12 +71,7 @@ axios.interceptors.request.use(
 // axios若返回非200状态码, 则message提示
 axios.interceptors.response.use(
   (res) => {
-    if (res.data.status !== 200) {
-      Element.Message.error(res.data.message)
-      return Promise.reject(res)
-    } else {
-      return res
-    }
+    return res
   },
   (error) => {
     Element.Message.error('请求失败，请稍后重试')
