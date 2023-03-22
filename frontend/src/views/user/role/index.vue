@@ -161,8 +161,7 @@ export default {
         children: 'children',
         label: 'label'
       },
-      deleteId: undefined,
-      checkMessage: false
+      deleteId: undefined
     }
   },
   created() {
@@ -171,8 +170,20 @@ export default {
   methods: {
     // 确认删除
     checkChange(row) {
-      this.checkMessage = true
-      this.deleteId = row.id
+      this.$confirm('此操作将永久删除该角色, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          this.handleDelete(row.id)
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
     },
     // 权限操作选择
     handleCommand(command, row) {
@@ -229,11 +240,6 @@ export default {
                 })
                 this.getRoles()
               }
-            }).catch(() => {
-              this.$message({
-                type: 'error',
-                message: '添加失败!'
-              })
             })
             this.dialogFormVisible = false
           } else {
@@ -250,11 +256,6 @@ export default {
                 })
                 this.getRoles()
               }
-            }).catch(() => {
-              this.$message({
-                type: 'error',
-                message: '修改失败!'
-              })
             })
             this.dialogFormVisible = false
           }
@@ -294,24 +295,17 @@ export default {
       })
     },
     // 删除角色
-    handleDelete(row) {
-      const params = new URLSearchParams()
+    handleDelete(id) {
+      const params = { params: { id: id }}
       const url = '/users/role/deleteRole'
-      params.append('id', this.deleteId)
-      this.$http.post(url, params).then((res) => {
+      console.log('id', id)
+      this.$http.delete(url, params).then((res) => {
         if (res.status === 200) {
           this.$message({
             type: 'success',
             message: '删除成功!'
-
           })
-          this.checkMessage = false
           this.getRoles()
-        } else {
-          this.$message({
-            type: 'error',
-            message: '删除失败!'
-          })
         }
       })
     },
@@ -343,7 +337,7 @@ export default {
     },
     handlePermission(row) {
       this.$router.push({
-        name: 'PermissionList',
+        name: 'Permission',
         params: {
           roleId: row.id
         }
