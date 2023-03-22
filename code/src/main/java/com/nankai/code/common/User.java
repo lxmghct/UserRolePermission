@@ -26,7 +26,6 @@ public class User implements Serializable, UserDetails {
     private String avatar;
     private Integer status;
     private Date createTime;
-    private Date loginTime;
     private String phone;
     private String address;
     private String note;

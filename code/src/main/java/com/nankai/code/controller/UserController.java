@@ -67,6 +67,7 @@ public class UserController {
             //3.3获取对象
             user = (User) authentication.getPrincipal();
         } catch (Exception e) {
+            System.out.println(e.getMessage() );
             if (e instanceof BadCredentialsException) {
                 //3.4用户名或密码错误
                 return ResponseVO.error(CodeEnum.ERROR, "用户名或密码错误");
