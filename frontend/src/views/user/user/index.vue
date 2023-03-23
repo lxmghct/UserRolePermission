@@ -163,7 +163,6 @@
 </template>
 
 <script>
-import md5 from 'js-md5'
 
 import { nextTick } from 'process'
 export default {
@@ -335,7 +334,7 @@ export default {
     createUser() {
       const params = new URLSearchParams()
       const url = '/users/user/addUser'
-      params.append('password', md5(this.userEditForm.password))
+      params.append('password', this.userEditForm.password)
       params.append('username', this.userEditForm.username)
       params.append('truename', this.userEditForm.truename)
       params.append('sex', this.userEditForm.sex)
