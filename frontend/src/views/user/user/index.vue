@@ -133,7 +133,7 @@
         <el-form-item label="真实姓名" prop="truename">
           <el-input v-model="userEditForm.truename" />
         </el-form-item>
-        <el-form-item v-if="userEditForm.dialogType=='create_user'" label="密码" prop="password">
+        <el-form-item v-if="userEditDialogData.dialogType==='create_user'" label="密码" prop="password">
           <el-input v-model="userEditForm.password" />
         </el-form-item>
         <el-form-item label="地址" prop="address">
