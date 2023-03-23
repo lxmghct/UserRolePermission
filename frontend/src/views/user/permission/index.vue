@@ -55,7 +55,8 @@
           </template>
         </template>
       </el-table-column>
-      <el-table-column label="权限类别" prop="classify" width="200" />
+      <el-table-column label="权限类别" prop="classify" width="100" />
+      <el-table-column label="权限代码" prop="permissionCode" width="200" />
       <el-table-column label="描述" prop="description" width="300" />
       <el-table-column label="创建时间" prop="createTime" width="200" />
     </el-table>
@@ -240,6 +241,12 @@ export default {
     },
 
     handleCheckChange(row) {
+      // 将所有与当前节点permissionCode相同的节点勾选/取消勾选
+      this.traverseTree(this.permissionTree, item => {
+        if (item.permissionCode === row.permissionCode) {
+          item.checked = row.checked
+        }
+      })
       // 子级全选/全不选
       this.checkAllChildren(row, row.checked)
       // 子级勾选时，父级也勾选
