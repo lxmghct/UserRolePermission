@@ -189,7 +189,6 @@ public class UserController {
      */
     @DeleteMapping("/deleteUser")
     @PreAuthorize("hasAuthority('MAN_USER_DELETE')")
-    @Transactional(rollbackFor = Exception.class)
     public ResponseVO<Integer> deleteUser(@RequestParam(value = "userIdList", required = true) List<Integer> userIdList) {
         userRoleService.remove(new QueryWrapper<UserRole>().in("user_id", userIdList));
         if (userService.removeByIds(userIdList)) {
@@ -238,7 +237,6 @@ public class UserController {
                 .setStatus(1)
                 .setCreateTime(new Date())
                 .setAvatar("defalut.jpg");
-        //2.添加新用户
         //2.添加新用户
         if (userService.save(user)) {
             //3.添加用户成功后，添加用户与角色的对应关系
