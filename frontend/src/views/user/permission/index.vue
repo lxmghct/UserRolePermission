@@ -262,7 +262,7 @@ export default {
     },
 
     savePermission() {
-      if (!this.roleForm.currentRole) {
+      if (!this.roleForm.currentRole || !this.roleForm.currentRole.id) {
         this.$message({
           message: '请选择角色',
           type: 'warning'
