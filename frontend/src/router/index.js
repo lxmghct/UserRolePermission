@@ -77,7 +77,7 @@ export const asyncRoutes = [
         path: 'dashboard',
         component: () => import('@/views/dashboard/index'),
         name: 'Dashboard',
-        meta: { title: '首页', icon: 'dashboard', affix: true }
+        meta: { title: '首页', icon: 'dashboard', affix: true, permissions: ['MAN_MAIN'] }
       }
     ]
   },
@@ -91,7 +91,7 @@ export const asyncRoutes = [
         path: 'index',
         component: () => import('@/views/user/user/index'),
         name: 'User',
-        meta: { title: '用户管理', icon: 'user', noCache: true }
+        meta: { title: '用户管理', icon: 'user', noCache: true, permissions: ['MAN_USER'] }
       }
     ]
   },
@@ -105,7 +105,7 @@ export const asyncRoutes = [
         path: 'index',
         component: () => import('@/views/user/role/index'),
         name: 'Role',
-        meta: { title: '角色管理', icon: 'user', noCache: true }
+        meta: { title: '角色管理', icon: 'user', noCache: true, permissions: ['MAN_ROLE'] }
       }
     ]
   },
@@ -119,7 +119,7 @@ export const asyncRoutes = [
         path: 'index',
         component: () => import('@/views/user/permission/index'),
         name: 'Permission',
-        meta: { title: '权限管理', icon: 'user', noCache: true }
+        meta: { title: '权限管理', icon: 'user', noCache: true, permissions: ['MAN_PERM'] }
       }
     ]
   },

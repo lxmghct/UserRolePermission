@@ -43,24 +43,10 @@ const actions = {
     params.append('system', '数据管理系统')
     return new Promise((resolve, reject) => {
       login(params).then(response => {
-        // const { data } = response
         commit('SET_TOKEN', 'admin-token')
         commit('SET_ID', response.data.user.id)
         localStorage.setItem('userId', response.data.user.id)
-        const componentSet = new Set()
-        componentSet.add('')
-        if (response.data.component) {
-          response.data.component.forEach(item => {
-            const temp = item.replace(/^\//, '').replace(/\/$/, '').replace(/^system\//, '')
-            let index = temp.indexOf('/')
-            while (index > 0) {
-              componentSet.add(temp.substring(0, index))
-              index = temp.indexOf('/', index + 1)
-            }
-            componentSet.add(temp)
-          })
-        }
-        localStorage.setItem('component', Array.from(componentSet))
+        localStorage.setItem('permission', response.data.user.permissions || [])
         sessionStorage.setItem('loginInformation', JSON.stringify(response.data))
         commit('SET_NAME', response.data.user.trueName)
         setToken('admin-token')
@@ -75,9 +61,9 @@ const actions = {
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
     //   getInfo(state.token).then(response => {
-      const components = localStorage.getItem('component')
+      const permissions = localStorage.getItem('permission')
       const data = {
-        roles: components ? components.split(',') : [],
+        roles: permissions ? permissions.split(',') : [],
         introduction: 'I am a super administrator',
         avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
         name: 'Super Admin' }
@@ -94,6 +80,7 @@ const actions = {
       }
       commit('SET_AVATAR', avatar)
       commit('SET_ROLES', roles)
+      console.log(state.roles)
       commit('SET_INTRODUCTION', introduction)
       resolve(data)
     }).catch(error => {
