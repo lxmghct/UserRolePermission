@@ -46,7 +46,7 @@ const actions = {
         commit('SET_TOKEN', 'admin-token')
         commit('SET_ID', response.data.user.id)
         localStorage.setItem('userId', response.data.user.id)
-        localStorage.setItem('permission', response.data.user.permissions || [])
+        sessionStorage.setItem('permission', response.data.user.permissions || [])
         sessionStorage.setItem('loginInformation', JSON.stringify(response.data))
         commit('SET_NAME', response.data.user.trueName)
         setToken('admin-token')
@@ -61,7 +61,7 @@ const actions = {
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
     //   getInfo(state.token).then(response => {
-      const permissions = localStorage.getItem('permission')
+      const permissions = sessionStorage.getItem('permission')
       const data = {
         roles: permissions ? permissions.split(',') : [],
         introduction: 'I am a super administrator',
