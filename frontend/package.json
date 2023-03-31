@@ -1,8 +1,8 @@
 {
-  "name": "manage",
+  "name": "manage_frontend",
   "version": "1.0.0",
   "description": "A Vue.js project",
-  "author": "Liao Tianyin <948589330@qq.com>",
+  "author": "longxiaoming",
   "private": true,
   "scripts": {
     "dev": "vue-cli-service serve",
